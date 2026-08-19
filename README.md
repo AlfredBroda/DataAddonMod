@@ -32,6 +32,49 @@ Supported data types are:
 
 The plugin subscribes to the game's data-load completion event, so addon data is processed after the base data is available.
 
+## Addon example
+
+A mod can provide an addon file such as:
+
+```text
+MyMod/
+`-- data/
+    `-- addons/
+        `-- loot/
+            `-- kiosks.json
+```
+
+The JSON file must contain an array of objects matching the corresponding Ostranauts data type. Each object needs a non-empty `strName` value. Files are read recursively, and malformed files are skipped with a warning in the BepInEx log.
+
+```
+[
+  {
+    "strName" : "ItmOKLGSupplyKioskInv",
+    "aLoots"  : [
+      "ItmSpaceTruckerSocksCompression=1.0x1-10",
+      "ItmSpaceTruckerBootKompart=0.8x1-3"
+    ]
+  },
+  {
+    "strName" : "ItmTraderSanDiegoClothesInv",
+    "aLoots"  : [
+      "ItmSpaceTruckerSocksCompression=1.0x1-10",
+      "ItmSpaceTruckerBootKompart=0.8x1-3"
+    ]
+  },
+  {
+    "strName" : "ItmTraderSanDiegoBlackWingInv",
+    "aLoots"  : [
+      "ItmSpaceTruckerBootKompart=1.0x25"
+    ]
+  }
+]
+```
+
+## Debug logging
+
+The plugin creates a BepInEx configuration entry named `General/DebugMode`. Set it to `true` to enable detailed addon processing logs.
+
 ## Installation
 
 This mod is available from [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3786272967)
@@ -155,24 +198,6 @@ DataAddon/
 ```
 
 Do not include `Config.Build.user.props`, `NuGet.Config`, `obj/`, or the local Ostranauts DLL references in the Workshop package. Test the packaged mod in a clean game installation and check `BepInEx/LogOutput.txt` for the successful plugin load and addon injection messages.
-
-## Addon example
-
-A mod can provide an addon file such as:
-
-```text
-MyMod/
-`-- data/
-    `-- addons/
-        `-- loot/
-            `-- kiosks.json
-```
-
-The JSON file must contain an array of objects matching the corresponding Ostranauts data type. Each object needs a non-empty `strName` value. Files are read recursively, and malformed files are skipped with a warning in the BepInEx log.
-
-## Debug logging
-
-The plugin creates a BepInEx configuration entry named `General/DebugMode`. Set it to `true` to enable detailed addon processing logs.
 
 ## Current limitations
 
