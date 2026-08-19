@@ -72,6 +72,7 @@ def deploy(
     game_dir = bepinex_dir.parent.parent
     package_dir = game_dir / "Ostranauts_Data" / "Mods" / "DataAddonMerge"
     plugins_dir = package_dir / "plugins"
+    data_dir = package_dir / "data"
     destination = plugins_dir / source.name
 
     if dry_run:
@@ -82,6 +83,7 @@ def deploy(
         return package_dir
 
     plugins_dir.mkdir(parents=True, exist_ok=True)
+    data_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(metadata_path, package_dir / "mod_info.json")
     shutil.copy2(preview_path, package_dir / "preview.png")
     shutil.copy2(source, destination)

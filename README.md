@@ -32,6 +32,10 @@ Supported data types are:
 
 The plugin subscribes to the game's data-load completion event, so addon data is processed after the base data is available.
 
+## Installation
+
+This mod is available from [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3786272967)
+
 ## Project layout
 
 ```text
