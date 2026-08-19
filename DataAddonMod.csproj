@@ -1,0 +1,148 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <AssemblyName>DataAddonMod</AssemblyName>
+    <Product>Data Addon Mod</Product>
+    <Version>1.0.0</Version>
+
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+
+  <Import Project="$(SolutionRoot)Config.Build.user.props" />
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+
+    <Reference Include="$(DependsDir)/Assembly-CSharp.dll" Publicize="true" />
+    
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExDir)/0Harmony.dll</HintPath>
+    </Reference>
+
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExDir)/BepInEx.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Accessibility">
+      <HintPath>$(DependsDir)/Accessibility.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(DependsDir)/Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+
+    <Reference Include="dnlib">
+      <HintPath>$(DependsDir)/UnityModManager/dnlib.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Ionic.Zip.Unity">
+      <HintPath>$(DependsDir)/Ionic.Zip.Unity.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>$(DependsDir)/Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Mono.Data.Tds">
+      <HintPath>$(DependsDir)/Mono.Data.Tds.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Mono.Posix">
+      <HintPath>$(DependsDir)/Mono.Posix.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Mono.Security">
+      <HintPath>$(DependsDir)/Mono.Security.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Mono.Web">
+      <HintPath>$(DependsDir)/Mono.Web.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Mono.WebBrowser">
+      <HintPath>$(DependsDir)/Mono.WebBrowser.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Ookii.Dialogs">
+      <HintPath>$(DependsDir)/Ookii.Dialogs.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Configuration">
+      <HintPath>$(DependsDir)/System.Configuration.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Design">
+      <HintPath>$(DependsDir)/System.Design.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Drawing.Design">
+      <HintPath>$(DependsDir)/System.Drawing.Design.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.EnterpriseServices">
+      <HintPath>$(DependsDir)/System.EnterpriseServices.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Security">
+      <HintPath>$(DependsDir)/System.Security.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Transactions">
+      <HintPath>$(DependsDir)/System.Transactions.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Web">
+      <HintPath>$(DependsDir)/System.Web.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Web.Services">
+      <HintPath>$(DependsDir)/System.Web.Services.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Windows.Forms">
+      <HintPath>$(DependsDir)/System.Windows.Forms.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(DependsDir)/Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine">
+      <HintPath>$(DependsDir)/UnityEngine.dll</HintPath>
+      <Aliases>global</Aliases>
+    </Reference>
+
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(DependsDir)/UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>$(DependsDir)/UnityEngine.Networking.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(DependsDir)/UnityEngine.UI.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Vectrosity">
+      <HintPath>$(DependsDir)/Vectrosity.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" PrivateAssets="all" Version="1.*" />
+
+    <PackageReference Include="BepInEx.Core" Version="5.4.*" />
+  </ItemGroup>
+
+  <Target Name="VerifyBuildProperties" BeforeTargets="Build">
+    <Error Condition="'$(DependsDir)' == ''" Text="DependsDir is empty. Check the import of Config.Build.user.props." />
+    <Error Condition="!Exists('$(DependsDir)')" Text="DependsDir does not exist: $(DependsDir)" />
+    <Error Condition="'$(BepInExDir)' == ''" Text="BepInExDir is empty. Check the import of Config.Build.user.props." />
+    <Error Condition="!Exists('$(BepInExDir)')" Text="BepInExDir does not exist: $(BepInExDir)" />
+    <Message Importance="High" Text="Using DependsDir=$(DependsDir)" />
+    <Message Importance="High" Text="Using BepInExDir=$(BepInExDir)" />
+  </Target>
+
+</Project>
