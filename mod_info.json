@@ -6,6 +6,7 @@
     "strGameVersion": "1.0.0.11",
     "strModVersion": "1.0.0",
     "strNotes": "A BepInEx plugin for Ostranauts that loads data extensions from installed (and not disabled) mods. Allows modification of Loot or CondOwner (and other) objects, like kiosk inventories or the Crew01 CO, without overwriting base game or other mod data",
+    "strWorkshopID"  : "3786272967",
     "aDependencies": [
       "3741030124"
     ]
