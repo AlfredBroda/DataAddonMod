@@ -1,8 +1,8 @@
 [
   {
-    "strName": "Data Addon Mod",
+    "strName": "Data Addon Loader",
     "strAuthor": "Frederoo",
-    "strModURL": "https://github.com/AlfredBroda/DataAddonMod",
+    "strModURL": "https://github.com/AlfredBroda/DataAddonMerge",
     "strGameVersion": "1.0.0.11",
     "strModVersion": "1.0.0",
     "strNotes": "A BepInEx plugin for Ostranauts that loads data extensions from installed (and not disabled) mods. Allows modification of Loot or CondOwner and other objects (like kiosk inventories or the Crew01 CO) without overwriting base game or other mod data",

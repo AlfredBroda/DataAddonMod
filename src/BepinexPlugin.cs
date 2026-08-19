@@ -5,7 +5,7 @@ using HarmonyLib;
 using System;
 using System.Reflection;
 
-namespace DataAddonMod;
+namespace DataAddonMerge;
 
 [BepInPlugin(LCMPluginInfo.PLUGIN_GUID, LCMPluginInfo.PLUGIN_NAME, LCMPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin

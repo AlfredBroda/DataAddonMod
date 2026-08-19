@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a DataAddonMod Workshop package in the Ostranauts Mods directory."""
+"""Build a DataAddonMerge Workshop package in the Ostranauts Mods directory."""
 
 from __future__ import annotations
 
@@ -12,10 +12,10 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_SOURCE = PROJECT_ROOT / "bin" / "Release" / "DataAddonMod.dll"
+DEFAULT_SOURCE = PROJECT_ROOT / "bin" / "Release" / "DataAddonMerge.dll"
 DEFAULT_PROPS = PROJECT_ROOT / "Config.Build.user.props"
 DEFAULT_METADATA = PROJECT_ROOT / "mod_info.json"
-DEFAULT_PREVIEW = PROJECT_ROOT / "preview.png"
+DEFAULT_PREVIEW = PROJECT_ROOT / "images" / "preview.png"
 
 
 def read_property(props_path: Path, property_name: str) -> str:
@@ -62,7 +62,7 @@ def deploy(
     if not preview_path.is_file():
         raise RuntimeError(
             f"Preview image not found: {preview_path}\n"
-            "Add preview.png to the project or pass --preview <path>."
+            "Add images/preview.png to the project or pass --preview <path>."
         )
 
     bepinex_dir = Path(read_property(props_path, "BepInExDir"))
@@ -70,7 +70,7 @@ def deploy(
         raise RuntimeError(f"BepInExDir does not exist: {bepinex_dir}")
 
     game_dir = bepinex_dir.parent.parent
-    package_dir = game_dir / "Ostranauts_Data" / "Mods" / "DataAddonMod"
+    package_dir = game_dir / "Ostranauts_Data" / "Mods" / "DataAddonMerge"
     plugins_dir = package_dir / "plugins"
     destination = plugins_dir / source.name
 
@@ -95,7 +95,7 @@ def main() -> int:
         "--source",
         type=Path,
         default=DEFAULT_SOURCE,
-        help="Release DLL to deploy (default: bin/Release/net48/DataAddonMod.dll)",
+        help="Release DLL to deploy (default: bin/Release/net48/DataAddonMerge.dll)",
     )
     parser.add_argument(
         "--props",

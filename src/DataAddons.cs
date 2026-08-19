@@ -10,7 +10,7 @@ using BepInEx.Logging;
 using LitJson;
 using Ostranauts.Core;
 
-namespace DataAddonMod
+namespace DataAddonMerge
 {
 	//Directory Type Mapping
 	public class DTM

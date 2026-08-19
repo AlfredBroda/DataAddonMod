@@ -2,8 +2,8 @@
 
   <PropertyGroup>
 
-    <AssemblyName>DataAddonMod</AssemblyName>
-    <Product>Data Addon Mod</Product>
+    <AssemblyName>DataAddonMerge</AssemblyName>
+    <Product>Data Addon Loader</Product>
     <Version>1.0.0</Version>
 
     <TargetFramework>net48</TargetFramework>
