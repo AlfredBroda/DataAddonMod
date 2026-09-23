@@ -39,8 +39,8 @@ namespace DataAddonMerge
 			{ "cond_rules", new DTM("ConditionRules", typeof(CondRule), () => DataHandler.dictCondRules) },
 			{ "cond_trigs", new DTM("ConditionTriggers", typeof(CondTrigger), () => DataHandler.dictCTs) },
 			{ "interactions", new DTM("Interactions", typeof(JsonInteraction), () => DataHandler.dictInteractions) },
-			{"personspecs", new DTM("PersonSpecs", typeof(JsonPersonSpec), () => DataHandler.dictPersonSpecs) },
-			{"pledges", new DTM("Pledges", typeof(JsonPledge), () => DataHandler.dictPledges) },
+			{ "personspecs", new DTM("PersonSpecs", typeof(JsonPersonSpec), () => DataHandler.dictPersonSpecs) },
+			{ "pledges", new DTM("Pledges", typeof(JsonPledge), () => DataHandler.dictPledges) },
 			// { "plots", new DTM("Plots", typeof(JsonPlot), () => DataHandler.dictPlots) },
 			{ "plot_manager", new DTM("PlotManager", typeof(JsonPlotManagerSettings), () => DataHandler.dictPlotManager) },
 		};
@@ -75,8 +75,8 @@ namespace DataAddonMerge
 				string strFolderPath = modInfo.GetDirectory();
 				if (!string.IsNullOrEmpty(strFolderPath))
 				{
-					char sep = Path.DirectorySeparatorChar;
-					string addonsPath = strFolderPath + sep + "data" + sep + "addons";
+					Plugin.LogDebug($"Mod: {modInfo.strName} at '{strFolderPath}'");	
+					string addonsPath = Path.Combine(strFolderPath.TrimEnd('\\', '/'), "data", "addons");
 					if (Directory.Exists(addonsPath))
 					{
 						Plugin.Log.LogInfo($"Loading from '{addonsPath}'");

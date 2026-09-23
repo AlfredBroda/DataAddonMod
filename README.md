@@ -163,10 +163,16 @@ The release plugin is written to:
 bin/Release/net48/DataAddonMerge.dll
 ```
 
-To create the Steam Workshop package in the configured game directory, run:
+The release script builds the project first, then creates the Steam Workshop package in the configured game directory:
 
 ```bash
 python3 scripts/deploy_release.py
+```
+
+Use `--no-build` only when packaging an existing Release DLL without recompiling:
+
+```bash
+python3 scripts/deploy_release.py --no-build
 ```
 
 The script reads `BepInExDir` from `Config.Build.user.props` and creates:

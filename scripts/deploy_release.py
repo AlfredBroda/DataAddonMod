@@ -6,12 +6,14 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_FILE = PROJECT_ROOT / "DataAddonMerge.csproj"
 DEFAULT_SOURCE = PROJECT_ROOT / "bin" / "Release" / "DataAddonMerge.dll"
 DEFAULT_PROPS = PROJECT_ROOT / "Config.Build.user.props"
 DEFAULT_METADATA = PROJECT_ROOT / "mod_info.json"
@@ -42,6 +44,20 @@ def validate_metadata(metadata_path: Path) -> None:
 
     if not isinstance(metadata, list) or not metadata:
         raise RuntimeError(f"Metadata must be a non-empty JSON array: {metadata_path}")
+
+
+def build_release() -> None:
+    print(f"Building {PROJECT_FILE.name} in Release configuration...")
+    try:
+        subprocess.run(
+            ["dotnet", "build", str(PROJECT_FILE), "--configuration", "Release"],
+            cwd=PROJECT_ROOT,
+            check=True,
+        )
+    except FileNotFoundError as error:
+        raise RuntimeError("dotnet was not found on PATH") from error
+    except subprocess.CalledProcessError as error:
+        raise RuntimeError(f"Release build failed with exit code {error.returncode}") from error
 
 
 def deploy(
@@ -122,9 +138,16 @@ def main() -> int:
         action="store_true",
         help="Print the deployment path without copying the DLL",
     )
+    parser.add_argument(
+        "--no-build",
+        action="store_true",
+        help="Skip the Release build and package the existing DLL",
+    )
     arguments = parser.parse_args()
 
     try:
+        if not arguments.no_build:
+            build_release()
         deploy(
             arguments.source.resolve(),
             arguments.props.resolve(),
