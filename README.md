@@ -13,7 +13,7 @@ The plugin scans each enabled Ostranauts mod for JSON files under:
 <mod>/data/addons/<data-type>/**/*.json
 ```
 
-Entries are keyed by their `strName` property. New entries are added to the game's data dictionaries. When an entry already exists, string-array properties are appended to the existing value.
+Entries are keyed by their `strName` property. New entries are added to the game's data dictionaries. When an entry already exists, writable `string` and `int` properties are replaced with the addon values, and writable `string[]` properties are appended to the existing value.
 
 Supported data types are:
 
@@ -208,7 +208,7 @@ Do not include `Config.Build.user.props`, `NuGet.Config`, `obj/`, or the local O
 ## Current limitations
 
 - Reference paths are local to the developer's installation.
-- The merger currently appends only writable `string[]` properties; other fields are not merged.
+- The merger replaces writable `string` and `int` properties with addon values, appends writable `string[]` properties, and leaves other field types untouched.
 - Addon files are loaded during the data-load completion callback, so invalid JSON or incompatible fields are reported at runtime.
 
 ## License
