@@ -12,13 +12,13 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
+PROJECT_NAME = "DataAddonMerge"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PROJECT_FILE = PROJECT_ROOT / "DataAddonMerge.csproj"
-DEFAULT_SOURCE = PROJECT_ROOT / "bin" / "Release" / "DataAddonMerge.dll"
+DEFAULT_SOURCE = PROJECT_ROOT / "bin" / "Release" / f"{PROJECT_NAME}.dll"
 DEFAULT_PROPS = PROJECT_ROOT / "Config.Build.user.props"
 DEFAULT_METADATA = PROJECT_ROOT / "mod_info.json"
 DEFAULT_PREVIEW = PROJECT_ROOT / "images" / "preview.png"
-
 
 def read_property(props_path: Path, property_name: str) -> str:
     try:
@@ -176,7 +176,7 @@ def deploy(
         raise RuntimeError(f"BepInExDir does not exist: {bepinex_dir}")
 
     game_dir = bepinex_dir.parent.parent
-    package_dir = game_dir / "Ostranauts_Data" / "Mods" / "DataAddonMerge"
+    package_dir = game_dir / "Ostranauts_Data" / "Mods" / PROJECT_NAME
     plugins_dir = package_dir / "plugins"
     data_dir = package_dir / "data"
     destination = plugins_dir / source.name
@@ -227,7 +227,7 @@ def main() -> int:
         "--source",
         type=Path,
         default=DEFAULT_SOURCE,
-        help="Release DLL to deploy (default: bin/Release/net48/DataAddonMerge.dll)",
+        help=f"Release DLL to deploy (default: bin/Release/net48/{PROJECT_NAME}.dll)",
     )
     parser.add_argument(
         "--props",
