@@ -40,6 +40,7 @@ namespace DataAddonMerge
 			{ "conditions", new DTM("Condition", typeof(JsonCond), () => DataHandler.dictConds) },
 			{ "cond_rules", new DTM("ConditionRule", typeof(CondRule), () => DataHandler.dictCondRules) },
 			{ "cond_trigs", new DTM("ConditionTrigger", typeof(JsonCondTrigger), () => DataHandler.dictCTs) },
+			// { "crewskins", new DTM("CrewSkins", typeof(string), () => DataHandler.dictCrewSkins) },
 			{ "interactions", new DTM("Interaction", typeof(JsonInteraction), () => DataHandler.dictInteractions) },
 			{ "personspecs", new DTM("PersonSpec", typeof(JsonPersonSpec), () => DataHandler.dictPersonSpecs) },
 			{ "pledges", new DTM("Pledge", typeof(JsonPledge), () => DataHandler.dictPledges) },
@@ -64,6 +65,8 @@ namespace DataAddonMerge
 				Plugin.Log.LogWarning("COs dict missing after data load!");
 				return;
 			}
+			Plugin.LogDebug($"InjectAddons(): COs dict has {DataHandler.dictCOs.Count} entries.");
+			Plugin.LogDebug($"InjectAddons(): COOverlays dict has {DataHandler.dictCOOverlays?.Count ?? 0} entries.");
 
 			Dictionary<string, JsonModInfo> mods = DataHandler.dictModInfos;
 
@@ -168,6 +171,7 @@ namespace DataAddonMerge
 					Array entries = parseMethod.MakeGenericMethod(mapping.TargetType.MakeArrayType())
 						.Invoke(null, new object[] { File.ReadAllText(file) }) as Array ?? Array.Empty<object>();
 
+					Plugin.LogDebug($"Mapping {mapping.Name} has {entries.Length} entries.");
 					foreach (object entry in entries)
 					{
 						if (entry == null)
@@ -179,16 +183,18 @@ namespace DataAddonMerge
 						string key = nameValue != null ? nameValue.ToString() : string.Empty;
 						if (string.IsNullOrEmpty(key))
 						{
+							Plugin.Log.LogWarning($"Mapping {mapping.Name}: Entry has null or empty strName; skipping.");
 							continue;
 						}
 
 						if (mapping.Entries.TryGetValue(key, out object existingEntry) && existingEntry != null)
 						{
-							Plugin.LogDebug($"Merging {mapping.Name} addon '{key}' from file '{file}' with existing entry.");
+							Plugin.LogDebug($"Merging {mapping.Name} addon '{key}' with existing entry.");
 							MergeFields(existingEntry, entry, mapping.TargetType);
 						}
 						else
 						{
+							Plugin.LogDebug($"Adding new {mapping.Name} addon '{key}'.");
 							mapping.Entries[key] = entry;
 						}
 					}
@@ -205,13 +211,10 @@ namespace DataAddonMerge
 			BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 			PropertyInfo[] properties = type.GetProperties(flags);
 			string objectName = type.GetProperty("strName")?.GetValue(addon, null)?.ToString() ?? "Unknown";
-			int replaces = 0;
-			int adds = 0;
-			int merges = 0;
 
 			foreach (PropertyInfo property in properties)
 			{
-				if (property.Name == "strName")
+				if (property.Name == "strName" || property.Name == "strType")
 				{
 					continue;
 				}
@@ -234,13 +237,11 @@ namespace DataAddonMerge
 					if (string.IsNullOrEmpty(targetValue))
 					{
 						property.SetValue(target, addonValue, null);
-						adds++;
 					}
 					else if (addonValue != targetValue)
 					{
 						Plugin.LogDebug($"MergeFields('{objectName}'): Replacing property '{property.Name}' existing value '{targetValue}' with addon value '{addonValue}'.");
 						property.SetValue(target, addonValue, null);
-						replaces++;
 					}
 				}
 				else if (property.PropertyType == typeof(int))
@@ -255,13 +256,11 @@ namespace DataAddonMerge
 					if (!targetValue.HasValue)
 					{
 						property.SetValue(target, addonValue.Value, null);
-						adds++;
 					}
 					else if (addonValue.Value > 0 && addonValue.Value != targetValue.Value)
 						{
 							Plugin.LogDebug($"MergeFields('{objectName}'): Replacing property '{property.Name}' existing value '{targetValue.Value}' with addon value '{addonValue.Value}'.");
 							property.SetValue(target, addonValue.Value, null);
-							replaces++;	
 						}
 				}
 				else
@@ -273,13 +272,18 @@ namespace DataAddonMerge
 					}
 
 					string[]? targetValue = property.GetValue(target, null) as string[];
-					string[] mergedValue = MergeArrays(targetValue ?? Array.Empty<string>(), addonValue);
-					Plugin.LogDebug($"MergeFields('{objectName}'): Merging property '{property.Name}' with {targetValue?.Length ?? 0} existing + {addonValue.Length} addon entries.");
+					string[] mergedValue = Array.Empty<string>();
+					if (property.Name == "aLoots" || property.Name == "aCOs")
+					{
+						mergedValue = MergeLootArrays(targetValue ?? Array.Empty<string>(), addonValue);
+						Plugin.LogDebug($"MergeFields('{objectName}'): Merging property '{property.Name}' with {targetValue?.Length ?? 0} existing + {addonValue.Length} addon entries, resulting in {mergedValue.Length} total entries (deduplicated by key).");
+					} else {
+						mergedValue = MergeArrays(targetValue ?? Array.Empty<string>(), addonValue);
+						Plugin.LogDebug($"MergeFields('{objectName}'): Merging property '{property.Name}' with {targetValue?.Length ?? 0} existing + {addonValue.Length} addon entries.");
+					}
 					property.SetValue(target, mergedValue, null);
-					merges++;
 				}
 			}
-			Plugin.LogDebug($"MergeFields('{objectName}'): Summary - Adds: {adds}, Replaces: {replaces}, Merges: {merges}");
 		}
 
 		private static string[] MergeArrays(string[] array1, string[] array2)
@@ -297,6 +301,112 @@ namespace DataAddonMerge
 			Array.Copy(array1, 0, combined, 0, array1.Length);
 			Array.Copy(array2, 0, combined, array1.Length, array2.Length);
 			return combined;
+		}
+
+		private static string[] MergeLootArrays(string[] array1, string[] array2)
+		{
+			if (array1 == null || array1.Length == 0)
+			{
+				return array2;
+			}
+			if (array2 == null || array2.Length == 0)
+			{
+				return array1;
+			}
+
+			List<string> combined = new List<string>(array1.Length + array2.Length);
+			Dictionary<string, int> keys = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+			foreach (string[] source in new[] { array1, array2 })
+			{
+				foreach (string value in source)
+				{
+					if (string.IsNullOrWhiteSpace(value))
+					{
+						continue;
+					}
+
+					string key = GetDuplicateKey(value);
+					if (string.IsNullOrEmpty(key))
+					{
+						combined.Add(value);
+						continue;
+					}
+
+					if (keys.TryGetValue(key, out int existingIndex))
+					{
+						Plugin.LogDebug($"MergeLootArrays: Replacing duplicate key '{key}' at index {existingIndex} with '{value}'.");
+						combined[existingIndex] = value;
+					}
+					else
+					{
+						keys[key] = combined.Count;
+						combined.Add(value);
+					}
+				}
+			}
+
+			return combined.ToArray();
+		}
+
+		private static string GetDuplicateKey(string value)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				return string.Empty;
+			}
+
+			string normalized = value.Trim();
+			if (normalized.StartsWith("-", StringComparison.Ordinal))
+			{
+				normalized = normalized.Substring(1).TrimStart();
+			}
+
+			int equalsIndex = normalized.IndexOf('=');
+			if (equalsIndex >= 0)
+			{
+				normalized = normalized.Substring(0, equalsIndex);
+			}
+
+			return normalized.Trim();
+		}
+
+		private static string[] DeduplicateArray(string[] values)
+		{
+			if (values == null || values.Length == 0)
+			{
+				return Array.Empty<string>();
+			}
+
+			List<string> result = new List<string>(values.Length);
+			Dictionary<string, int> keys = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+			foreach (string value in values)
+			{
+				if (string.IsNullOrWhiteSpace(value))
+				{
+					continue;
+				}
+
+				string key = GetDuplicateKey(value);
+				if (string.IsNullOrEmpty(key))
+				{
+					result.Add(value);
+					continue;
+				}
+
+				if (keys.TryGetValue(key, out int existingIndex))
+				{
+					result[existingIndex] = value;
+				}
+				else
+				{
+					keys[key] = result.Count;
+					result.Add(value);
+				}
+			}
+
+			return result.ToArray();
 		}
 	}
 }
