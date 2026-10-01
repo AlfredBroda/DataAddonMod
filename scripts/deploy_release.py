@@ -14,7 +14,7 @@ from pathlib import Path
 
 PROJECT_NAME = "DataAddonMerge"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-PROJECT_FILE = PROJECT_ROOT / "DataAddonMerge.csproj"
+PROJECT_FILE = PROJECT_ROOT / f"{PROJECT_NAME}.csproj"
 DEFAULT_SOURCE = PROJECT_ROOT / "bin" / "Release" / f"{PROJECT_NAME}.dll"
 DEFAULT_PROPS = PROJECT_ROOT / "Config.Build.user.props"
 DEFAULT_METADATA = PROJECT_ROOT / "mod_info.json"
