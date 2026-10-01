@@ -163,7 +163,7 @@ The release plugin is written to:
 bin/Release/net48/DataAddonMerge.dll
 ```
 
-The release script builds the project first, then creates the Steam Workshop package in the configured game directory:
+The release script uses the latest reachable Git tag from `git describe --tags --abbrev=0`. If the repository has no tags, it creates the first bare version tag from the project version. It syncs the selected tag to `strModVersion` in `mod_info.json`, creates the Steam Workshop package in the configured game directory, and writes a versioned archive such as `bin/Release/DataAddonMerge-v1.2.0.zip`:
 
 ```bash
 python3 scripts/deploy_release.py
@@ -190,6 +190,8 @@ Use `--dry-run` to inspect the package paths without copying:
 ```bash
 python3 scripts/deploy_release.py --dry-run
 ```
+
+Dry runs do not create tags, update metadata, or write the archive. Tags created by the script are local; push them separately when publishing a release.
 
 Use `--source`, `--props`, `--metadata`, or `--preview` when deploying from different build, game, metadata, or image locations.
 
